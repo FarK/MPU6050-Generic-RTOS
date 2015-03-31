@@ -49,7 +49,7 @@ void MPU6050_Initialize()
     MPU6050_SetClockSource(MPU6050_CLOCK_PLL_XGYRO);
     MPU6050_SetFullScaleGyroRange(MPU6050_GYRO_FS_250);
     MPU6050_SetFullScaleAccelRange(MPU6050_ACCEL_FS_2);
-    MPU6050_SetSleepModeStatus(DISABLE);
+    MPU6050_SetSleepModeStatus(0);
 }
 
 /** Verify the I2C connection.
@@ -58,7 +58,7 @@ void MPU6050_Initialize()
  */
 bool MPU6050_TestConnection()
 {
-    return MPU6050_GetDeviceID() == 0x34 ? TRUE : FALSE; //0b110100; 8-bit representation in hex = 0x34
+    return MPU6050_GetDeviceID() == 0x34 ? true : false; //0b110100; 8-bit representation in hex = 0x34
 }
 // WHO_AM_I register
 
@@ -198,16 +198,16 @@ bool MPU6050_GetSleepModeStatus()
 {
     uint8_t tmp;
     MPU6050_ReadBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, &tmp);
-    return tmp == 0x00 ? FALSE : TRUE;
+    return tmp == 0x00 ? false : true;
 }
 
 /** Set sleep mode status.
- * @param enabled New sleep mode enabled status
+ * @param true New sleep mode enabled status
  * @see MPU6050_GetSleepModeStatus()
  * @see MPU6050_RA_PWR_MGMT_1
  * @see MPU6050_PWR1_SLEEP_BIT
  */
-void MPU6050_SetSleepModeStatus(FunctionalState NewState)
+void MPU6050_SetSleepModeStatus(bool NewState)
 {
     MPU6050_WriteBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, NewState);
 }
@@ -217,16 +217,16 @@ void MPU6050_SetSleepModeStatus(FunctionalState NewState)
  * @param AccelGyro 16-bit signed integer array of length 6
  * @see MPU6050_RA_ACCEL_XOUT_H
  */
-void MPU6050_GetRawAccelGyro(s16* AccelGyro)
+void MPU6050_GetRawAccelGyro(int16_t* AccelGyro)
 {
-    u8 tmpBuffer[14];
+    uint8_t tmpBuffer[14];
     MPU6050_I2C_BufferRead(MPU6050_DEFAULT_ADDRESS, tmpBuffer, MPU6050_RA_ACCEL_XOUT_H, 14);
     /* Get acceleration */
     for (int i = 0; i < 3; i++)
-        AccelGyro[i] = ((s16) ((u16) tmpBuffer[2 * i] << 8) + tmpBuffer[2 * i + 1]);
+        AccelGyro[i] = ((int16_t) ((uint16_t) tmpBuffer[2 * i] << 8) + tmpBuffer[2 * i + 1]);
     /* Get Angular rate */
     for (int i = 4; i < 7; i++)
-        AccelGyro[i - 1] = ((s16) ((u16) tmpBuffer[2 * i] << 8) + tmpBuffer[2 * i + 1]);
+        AccelGyro[i - 1] = ((int16_t) ((uint16_t) tmpBuffer[2 * i] << 8) + tmpBuffer[2 * i + 1]);
 
 }
 
